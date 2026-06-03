@@ -35,6 +35,8 @@ The Vite dev server proxies `/api` requests to `http://localhost:8000`.
 npm test
 ```
 
+Coverage includes Zod schemas, API error helpers, validation mapping, and employee form interactions.
+
 ## Structure
 
 ```text

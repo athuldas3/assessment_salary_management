@@ -1,4 +1,4 @@
-import { ApiError } from "../client";
+import { ApiError } from "../api/client";
 
 export function applyApiValidationErrors<T extends Record<string, unknown>>(
   error: unknown,
