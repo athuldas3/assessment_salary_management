@@ -76,3 +76,9 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```bash
 pytest
 ```
+
+## Seed
+
+```bash
+python scripts/seed_employees.py --count 10000 --batch-size 500 --clear
+```
