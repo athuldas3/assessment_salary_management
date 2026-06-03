@@ -130,21 +130,77 @@ This project also sets `network: host` on backend/frontend **builds** in `docker
 
 ## Useful Commands
 
+### Start and stop
+
 ```bash
-# Rebuild after code changes
+# Start full stack (build images if needed)
 docker compose up --build
 
-# Run in background
+# Start in background
 docker compose up --build -d
 
-# View logs
+# Stop containers (keep database volume)
+docker compose down
+
+# Stop and remove database volume (fresh start, re-seeds on next up)
+docker compose down -v
+```
+
+### Rebuild
+
+```bash
+# Rebuild all services after code changes
+docker compose up --build
+
+# Rebuild and restart one service only
+docker compose up --build backend
+docker compose up --build frontend
+
+# Force a clean image rebuild (ignore cache)
+docker compose build --no-cache
+docker compose up -d
+```
+
+### Logs and status
+
+```bash
+# All services
+docker compose logs -f
+
+# One service
 docker compose logs -f backend
 docker compose logs -f frontend
+docker compose logs -f db
 
-# Smoke test
+# Last 100 lines without following
+docker compose logs --tail=100 backend
+
+# Running containers and ports
+docker compose ps
+```
+
+### Reset and troubleshoot
+
+```bash
+# Wipe data volume and start fresh (migrations + seed run again)
+docker compose down -v && docker compose up --build
+
+# Rebuild backend only after dependency or migration changes
+docker compose up --build --force-recreate backend
+```
+
+### Smoke tests
+
+```bash
 curl http://localhost:8080/api/v1/health
 curl "http://localhost:8080/api/v1/employees?page_size=1"
+curl http://localhost:8000/docs
 ```
+
+Open in browser:
+
+- http://localhost:8080/employees
+- http://localhost:8080/insights
 
 ## Related Docs
 

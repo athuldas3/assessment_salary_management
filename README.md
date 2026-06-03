@@ -74,6 +74,22 @@ Open http://localhost:8080/employees
 
 See [docs/docker.md](docs/docker.md) for ports, environment variables, and troubleshooting.
 
+### Common Docker commands
+
+| Task | Command |
+|---|---|
+| Start stack (foreground) | `docker compose up --build` |
+| Start stack (background) | `docker compose up --build -d` |
+| Stop containers | `docker compose down` |
+| Reset database and re-seed | `docker compose down -v && docker compose up --build` |
+| Rebuild one service | `docker compose up --build backend` or `frontend` |
+| View all logs | `docker compose logs -f` |
+| View backend logs | `docker compose logs -f backend` |
+| Check running services | `docker compose ps` |
+| Smoke test API | `curl http://localhost:8080/api/v1/health` |
+
+Full reference: [docs/docker.md](docs/docker.md)
+
 ## Tests
 
 Backend (uses `test_db`):
