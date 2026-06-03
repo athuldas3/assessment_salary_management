@@ -73,9 +73,21 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ## Test
 
+Tests run against the separate PostgreSQL database configured in `TEST_DATABASE_URL`.
+
 ```bash
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/test_db alembic upgrade head
 pytest
 ```
+
+Test coverage includes:
+
+- API integration tests
+- Service-layer behavior
+- Repository query and pagination behavior
+- Salary insight aggregate calculations
+- Seed validation
+- Error handling and transaction rollback
 
 ## Seed
 

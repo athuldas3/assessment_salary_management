@@ -6,6 +6,9 @@ from app.api.deps import get_db
 from app.core.config import settings
 from app.main import app
 from app.repositories.employee_repository import EmployeeRepository
+from app.repositories.insights_repository import InsightsRepository
+from app.services.employee_service import EmployeeService
+from app.services.insights_service import InsightsService
 
 
 @pytest.fixture(scope="session")
@@ -38,6 +41,34 @@ async def clean_employees(db_session):
     yield
     await repository.delete_all()
     await db_session.commit()
+
+
+@pytest.fixture
+def employee_repository(db_session) -> EmployeeRepository:
+    return EmployeeRepository(db_session)
+
+
+@pytest.fixture
+def insights_repository(db_session) -> InsightsRepository:
+    return InsightsRepository(db_session)
+
+
+@pytest.fixture
+def employee_service(employee_repository) -> EmployeeService:
+    return EmployeeService(employee_repository)
+
+
+@pytest.fixture
+def insights_service(insights_repository) -> InsightsService:
+    return InsightsService(insights_repository)
+
+
+@pytest.fixture
+async def seeded_repository(employee_repository):
+    from tests.helpers import seed_sample_employees
+
+    await seed_sample_employees(employee_repository)
+    return employee_repository
 
 
 @pytest.fixture
