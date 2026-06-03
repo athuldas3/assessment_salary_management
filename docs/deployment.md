@@ -180,32 +180,19 @@ Good for managed platforms with minimal ops.
 3. Build env: `VITE_API_BASE_URL=https://your-api-host/api/v1`
 4. Configure SPA fallback so `/employees` and `/insights` route to `index.html`
 
-## Option C — Docker Compose (Local Staging)
+## Option C — Docker Compose
 
-Useful for reproducible staging without committing full cloud IaC. Example shape:
+The repository includes a full local stack: PostgreSQL, FastAPI backend, and nginx-served React frontend.
 
-```yaml
-services:
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: salary_management
-    ports:
-      - "5432:5432"
-
-  api:
-    build: ./backend
-    environment:
-      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/salary_management
-      CORS_ORIGINS: http://localhost:5173
-    depends_on:
-      - db
-    ports:
-      - "8000:8000"
+```bash
+docker compose up --build
 ```
 
-A production Dockerfile was not included in the assessment repo to keep scope focused on application code and documentation. Add Dockerfiles only if your team standardizes on containers.
+- App UI: http://localhost:8080
+- API health: http://localhost:8080/api/v1/health
+- OpenAPI (direct): http://localhost:8000/docs
+
+Migrations and seeding run automatically on backend startup. See [docker.md](./docker.md) for environment variables, persistence, and troubleshooting.
 
 ## Database Operations
 
@@ -285,3 +272,4 @@ Minimum baseline:
 - [Root README](../README.md) — local setup
 - [Architecture](./architecture.md) — system design and trade-offs
 - [Demo script](./demo-script.md) — post-deploy verification walkthrough
+- [Docker setup](./docker.md) — run full stack with Docker Compose

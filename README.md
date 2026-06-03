@@ -62,6 +62,18 @@ Routes:
 - `/employees` — paginated employee management (search, filter, CRUD)
 - `/insights` — salary analytics dashboard
 
+## Docker Quick Start
+
+Run PostgreSQL, backend, and frontend together:
+
+```bash
+docker compose up --build
+```
+
+Open http://localhost:8080/employees
+
+See [docs/docker.md](docs/docker.md) for ports, environment variables, and troubleshooting.
+
 ## Tests
 
 Backend (uses `test_db`):
@@ -103,6 +115,7 @@ Current coverage: **46 backend tests**, **13 frontend tests**.
 | [API design](docs/api-design.md) | REST endpoints and response shapes |
 | [API cURL examples](docs/api-curl-examples.md) | Copy-paste curl commands for manual API testing |
 | [Scripts and commands](docs/scripts.md) | How to run seed, migrations, API, and tests |
+| [Docker setup](docs/docker.md) | Run full stack with Docker Compose |
 | [AI usage notes](docs/ai-usage-notes.md) | How AI assisted and how correctness was verified |
 | [Demo script](docs/demo-script.md) | Step-by-step walkthrough for reviewers |
 | [Deployment guidance](docs/deployment.md) | Production env vars, hosting options, and release checklist |

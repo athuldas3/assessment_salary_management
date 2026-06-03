@@ -37,6 +37,7 @@ alembic upgrade head
 | Rollback one migration | `alembic downgrade -1` |
 | Backend tests | `pytest` |
 | Frontend tests | `cd ../frontend && npm test` |
+| Run full stack in Docker | `docker compose up --build` (see [docker.md](../docs/docker.md)) |
 
 **Typical first-time flow:**
 
@@ -55,6 +56,16 @@ cd frontend
 npm install
 npm run dev
 ```
+
+### Docker alternative
+
+From the repository root, run migrations, seed, backend, and frontend together:
+
+```bash
+docker compose up --build
+```
+
+Open http://localhost:8080 — no local Python/Node setup required. Details: [docs/docker.md](../docs/docker.md).
 
 ---
 
