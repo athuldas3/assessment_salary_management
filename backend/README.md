@@ -26,6 +26,25 @@ Database settings:
 
 PostgreSQL connection: `postgres` / `postgres` @ `localhost:5432`
 
+Create databases if needed:
+
+```sql
+CREATE DATABASE salary_management;
+CREATE DATABASE test_db;
+```
+
+## Migrations
+
+```bash
+alembic upgrade head
+```
+
+Rollback latest migration:
+
+```bash
+alembic downgrade -1
+```
+
 ## Run
 
 ```bash
