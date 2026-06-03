@@ -52,3 +52,9 @@ src/
 3. Start frontend: `npm run dev`
 4. Open `/employees` to manage employee records
 5. Open `/insights` to review salary analytics
+
+## UX
+
+- Loading skeletons and refresh indicators on list and insights pages
+- API validation errors mapped to form fields
+- Success snackbars after create, update, and delete

@@ -1,4 +1,4 @@
-import { Alert, CircularProgress, Stack } from "@mui/material";
+import { Alert, Chip, Stack } from "@mui/material";
 import { useMemo } from "react";
 
 import { useEmployeeFilters } from "../api/hooks/useEmployees";
@@ -7,10 +7,12 @@ import {
   useDepartmentInsights,
   useJobTitleInsights,
 } from "../api/hooks/useInsights";
+import { ErrorAlert } from "../components/common/ErrorAlert";
 import { PageHeader } from "../components/layout/PageHeader";
 import { CountryInsightsTable } from "../features/insights/CountryInsightsTable";
 import { CountryJobTitleLookup } from "../features/insights/CountryJobTitleLookup";
 import { InsightStatCard } from "../features/insights/InsightStatCard";
+import { InsightsSkeleton } from "../features/insights/InsightsSkeleton";
 import {
   InsightsGrid,
   InsightsGridItem,
@@ -26,6 +28,8 @@ export function InsightsPage() {
   const isLoading =
     countryQuery.isLoading || departmentQuery.isLoading || jobTitleQuery.isLoading;
   const isError = countryQuery.isError || departmentQuery.isError || jobTitleQuery.isError;
+  const isFetching =
+    countryQuery.isFetching || departmentQuery.isFetching || jobTitleQuery.isFetching;
 
   const summary = useMemo(() => {
     const countries = countryQuery.data?.items ?? [];
@@ -47,20 +51,22 @@ export function InsightsPage() {
         description="Review compensation trends by country, department, and job title."
       />
 
-      {isLoading ? (
-        <Stack alignItems="center" py={6}>
-          <CircularProgress />
-        </Stack>
-      ) : null}
+      {isLoading && !countryQuery.data ? <InsightsSkeleton /> : null}
 
       {isError ? (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          Unable to load salary insights. Confirm the backend is running and seeded.
-        </Alert>
+        <ErrorAlert error={countryQuery.error ?? departmentQuery.error ?? jobTitleQuery.error} title="Unable to load salary insights" />
       ) : null}
 
       {countryQuery.data ? (
-        <Stack spacing={3}>
+        <Stack spacing={3} sx={{ opacity: isFetching ? 0.75 : 1, transition: "opacity 0.2s" }}>
+          {isFetching ? <Chip label="Refreshing insights..." size="small" /> : null}
+
+          {summary.totalEmployees === 0 ? (
+            <Alert severity="info">
+              No employee data is available yet. Seed the database to view salary insights.
+            </Alert>
+          ) : null}
+
           <InsightsGrid>
             <InsightsGridItem md={4}>
               <InsightStatCard

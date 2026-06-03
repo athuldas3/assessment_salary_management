@@ -20,6 +20,7 @@ export function useCountryInsights() {
   return useQuery({
     queryKey: insightKeys.country,
     queryFn: getCountryInsights,
+    staleTime: 60_000,
   });
 }
 
@@ -27,6 +28,7 @@ export function useDepartmentInsights() {
   return useQuery({
     queryKey: insightKeys.department,
     queryFn: getDepartmentInsights,
+    staleTime: 60_000,
   });
 }
 
@@ -34,6 +36,7 @@ export function useJobTitleInsights() {
   return useQuery({
     queryKey: insightKeys.jobTitle,
     queryFn: getJobTitleInsights,
+    staleTime: 60_000,
   });
 }
 

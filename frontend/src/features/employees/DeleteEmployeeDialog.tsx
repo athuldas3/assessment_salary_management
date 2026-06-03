@@ -1,5 +1,6 @@
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -42,7 +43,13 @@ export function DeleteEmployeeDialog({
         <Button onClick={onClose} disabled={isSubmitting}>
           Cancel
         </Button>
-        <Button color="error" variant="contained" onClick={onConfirm} disabled={isSubmitting}>
+        <Button
+          color="error"
+          variant="contained"
+          onClick={onConfirm}
+          disabled={isSubmitting}
+          startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined}
+        >
           Delete
         </Button>
       </DialogActions>

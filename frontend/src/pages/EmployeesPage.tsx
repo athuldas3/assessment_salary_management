@@ -1,5 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
-import { Alert, Button, CircularProgress, Stack } from "@mui/material";
+import { Alert, Box, Button, Chip, Stack } from "@mui/material";
 import { useMemo, useState } from "react";
 
 import {
@@ -10,6 +10,9 @@ import {
   useUpdateEmployee,
 } from "../api/hooks/useEmployees";
 import type { Employee } from "../api/types";
+import { ErrorAlert } from "../components/common/ErrorAlert";
+import { SuccessSnackbar } from "../components/common/SuccessSnackbar";
+import { TableSkeleton } from "../components/common/TableSkeleton";
 import { PageHeader } from "../components/layout/PageHeader";
 import { DeleteEmployeeDialog } from "../features/employees/DeleteEmployeeDialog";
 import { EmployeeFiltersBar } from "../features/employees/EmployeeFiltersBar";
@@ -30,6 +33,7 @@ export function EmployeesPage() {
   const [country, setCountry] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [dialogState, setDialogState] = useState<DialogState>({ type: "closed" });
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const listParams = useMemo(
     () => ({
@@ -59,6 +63,7 @@ export function EmployeesPage() {
 
   const handleCreate = async (values: EmployeeFormValues) => {
     await createMutation.mutateAsync(values);
+    setSuccessMessage("Employee created successfully.");
     closeDialog();
   };
 
@@ -71,6 +76,7 @@ export function EmployeesPage() {
       id: dialogState.employee.id,
       payload: values,
     });
+    setSuccessMessage("Employee updated successfully.");
     closeDialog();
   };
 
@@ -80,6 +86,7 @@ export function EmployeesPage() {
     }
 
     await deleteMutation.mutateAsync(dialogState.employee.id);
+    setSuccessMessage("Employee deleted successfully.");
     closeDialog();
   };
 
@@ -107,6 +114,12 @@ export function EmployeesPage() {
         </Button>
       </Stack>
 
+      {filtersQuery.isError ? (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          Filter options could not be loaded. You can still search and manage employees.
+        </Alert>
+      ) : null}
+
       <EmployeeFiltersBar
         search={search}
         country={country}
@@ -128,32 +141,42 @@ export function EmployeesPage() {
         onClear={clearFilters}
       />
 
-      {employeesQuery.isLoading ? (
-        <Stack alignItems="center" py={6}>
-          <CircularProgress />
-        </Stack>
+      {employeesQuery.isLoading && !employeesQuery.data ? (
+        <TableSkeleton />
       ) : null}
 
       {employeesQuery.isError ? (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          Unable to load employees. Confirm the backend is running and seeded.
-        </Alert>
+        <ErrorAlert
+          error={employeesQuery.error}
+          title="Unable to load employees"
+        />
       ) : null}
 
       {employeesQuery.data ? (
-        <EmployeeTable
-          employees={employeesQuery.data.items}
-          page={page}
-          pageSize={pageSize}
-          totalItems={employeesQuery.data.total_items}
-          onPageChange={setPage}
-          onPageSizeChange={(nextPageSize) => {
-            setPageSize(nextPageSize);
-            setPage(0);
-          }}
-          onEdit={(employee) => setDialogState({ type: "edit", employee })}
-          onDelete={(employee) => setDialogState({ type: "delete", employee })}
-        />
+        <Box sx={{ opacity: employeesQuery.isFetching ? 0.7 : 1, transition: "opacity 0.2s" }}>
+          {employeesQuery.isFetching ? (
+            <Chip label="Refreshing..." size="small" sx={{ mb: 2 }} />
+          ) : null}
+          <EmployeeTable
+            employees={employeesQuery.data.items}
+            page={page}
+            pageSize={pageSize}
+            totalItems={employeesQuery.data.total_items}
+            onPageChange={setPage}
+            onPageSizeChange={(nextPageSize) => {
+              setPageSize(nextPageSize);
+              setPage(0);
+            }}
+            onEdit={(employee) => setDialogState({ type: "edit", employee })}
+            onDelete={(employee) => setDialogState({ type: "delete", employee })}
+          />
+        </Box>
+      ) : null}
+
+      {!employeesQuery.isLoading && employeesQuery.data?.total_items === 0 ? (
+        <Alert severity="info" sx={{ mt: 2 }}>
+          No employees found. Add a record or run the backend seed script.
+        </Alert>
       ) : null}
 
       <EmployeeFormDialog
@@ -173,6 +196,12 @@ export function EmployeesPage() {
         submitError={deleteMutation.error}
         onClose={closeDialog}
         onConfirm={handleDelete}
+      />
+
+      <SuccessSnackbar
+        open={Boolean(successMessage)}
+        message={successMessage ?? ""}
+        onClose={() => setSuccessMessage(null)}
       />
     </>
   );

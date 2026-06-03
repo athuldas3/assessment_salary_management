@@ -1,6 +1,7 @@
 import {
   Alert,
   Button,
+  CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
@@ -12,6 +13,7 @@ import {
 import { useState } from "react";
 
 import { useCountryJobTitleInsight } from "../../api/hooks/useInsights";
+import { ErrorAlert } from "../../components/common/ErrorAlert";
 import { InsightStatCard } from "./InsightStatCard";
 
 type CountryJobTitleLookupProps = {
@@ -76,22 +78,34 @@ export function CountryJobTitleLookup({ countries, jobTitles }: CountryJobTitleL
         <Button
           variant="contained"
           onClick={handleSubmit}
-          disabled={!country || !jobTitle}
+          disabled={!country || !jobTitle || insightQuery.isFetching}
           sx={{ minWidth: 140 }}
+          startIcon={
+            insightQuery.isFetching ? <CircularProgress size={16} color="inherit" /> : undefined
+          }
         >
           Analyze
         </Button>
       </Stack>
 
       {insightQuery.isError ? (
-        <Alert severity="error">Unable to load insight for the selected filters.</Alert>
+        <ErrorAlert error={insightQuery.error} title="Unable to load selected insight" />
       ) : null}
 
-      {insightQuery.data ? (
+      {insightQuery.isLoading && submitted ? (
+        <Stack direction="row" spacing={2}>
+          <InsightStatCard label="Average salary" value="Loading..." />
+          <InsightStatCard label="Employee count" value="..." />
+        </Stack>
+      ) : null}
+
+      {insightQuery.data &&
+      !insightQuery.isFetching &&
+      insightQuery.data.employee_count > 0 ? (
         <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
           <InsightStatCard
             label="Average salary"
-            value={insightQuery.data.avg_salary ?? "No data"}
+            value={insightQuery.data.avg_salary ?? "No matching employees"}
           />
           <InsightStatCard
             label="Employee count"
@@ -99,6 +113,15 @@ export function CountryJobTitleLookup({ countries, jobTitles }: CountryJobTitleL
             helperText={`${insightQuery.data.country} · ${insightQuery.data.job_title}`}
           />
         </Stack>
+      ) : null}
+
+      {submitted &&
+      insightQuery.data &&
+      insightQuery.data.employee_count === 0 &&
+      !insightQuery.isFetching ? (
+        <Alert severity="info" sx={{ mt: 2 }}>
+          No employees match the selected country and job title.
+        </Alert>
       ) : null}
     </Paper>
   );

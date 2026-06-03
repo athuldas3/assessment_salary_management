@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -14,6 +15,7 @@ import { Controller, useForm } from "react-hook-form";
 import type { Employee } from "../../api/types";
 import { ErrorAlert } from "../../components/common/ErrorAlert";
 import { employeeSchema, type EmployeeFormValues } from "../../schemas/employee";
+import { applyApiValidationErrors } from "../../utils/validation";
 
 type EmployeeFormDialogProps = {
   open: boolean;
@@ -46,6 +48,7 @@ export function EmployeeFormDialog({
     control,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeSchema),
@@ -71,6 +74,12 @@ export function EmployeeFormDialog({
     reset(emptyValues);
   }, [employee, mode, open, reset]);
 
+  useEffect(() => {
+    if (submitError) {
+      applyApiValidationErrors<EmployeeFormValues>(submitError, setError);
+    }
+  }, [setError, submitError]);
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{mode === "create" ? "Add Employee" : "Edit Employee"}</DialogTitle>
@@ -89,6 +98,7 @@ export function EmployeeFormDialog({
                   error={Boolean(errors.full_name)}
                   helperText={errors.full_name?.message}
                   fullWidth
+                  disabled={isSubmitting}
                 />
               )}
             />
@@ -103,6 +113,7 @@ export function EmployeeFormDialog({
                   error={Boolean(errors.country)}
                   helperText={errors.country?.message}
                   fullWidth
+                  disabled={isSubmitting}
                 />
               )}
             />
@@ -117,6 +128,7 @@ export function EmployeeFormDialog({
                   error={Boolean(errors.job_title)}
                   helperText={errors.job_title?.message}
                   fullWidth
+                  disabled={isSubmitting}
                 />
               )}
             />
@@ -131,6 +143,7 @@ export function EmployeeFormDialog({
                   error={Boolean(errors.department)}
                   helperText={errors.department?.message}
                   fullWidth
+                  disabled={isSubmitting}
                 />
               )}
             />
@@ -145,6 +158,7 @@ export function EmployeeFormDialog({
                   error={Boolean(errors.salary)}
                   helperText={errors.salary?.message}
                   fullWidth
+                  disabled={isSubmitting}
                 />
               )}
             />
@@ -154,7 +168,12 @@ export function EmployeeFormDialog({
           <Button onClick={onClose} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined}
+          >
             {mode === "create" ? "Create" : "Save changes"}
           </Button>
         </DialogActions>

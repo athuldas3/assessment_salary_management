@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 
 import {
   createEmployee,
@@ -10,6 +10,7 @@ import {
   type EmployeeListQuery,
 } from "../employees";
 import type { EmployeeInput } from "../types";
+import { insightKeys } from "./useInsights";
 
 export const employeeKeys = {
   all: ["employees"] as const,
@@ -22,6 +23,7 @@ export function useEmployeeFilters() {
   return useQuery({
     queryKey: employeeKeys.filters,
     queryFn: getEmployeeFilters,
+    staleTime: 60_000,
   });
 }
 
@@ -29,6 +31,7 @@ export function useEmployees(params: EmployeeListQuery) {
   return useQuery({
     queryKey: employeeKeys.list(params),
     queryFn: () => getEmployees(params),
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -47,6 +50,7 @@ export function useCreateEmployee() {
     mutationFn: createEmployee,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: employeeKeys.all });
+      await queryClient.invalidateQueries({ queryKey: insightKeys.all });
     },
   });
 }
@@ -59,6 +63,7 @@ export function useUpdateEmployee() {
       updateEmployee(id, payload),
     onSuccess: async (_, variables) => {
       await queryClient.invalidateQueries({ queryKey: employeeKeys.all });
+      await queryClient.invalidateQueries({ queryKey: insightKeys.all });
       await queryClient.invalidateQueries({
         queryKey: employeeKeys.detail(variables.id),
       });
@@ -73,6 +78,7 @@ export function useDeleteEmployee() {
     mutationFn: deleteEmployee,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: employeeKeys.all });
+      await queryClient.invalidateQueries({ queryKey: insightKeys.all });
     },
   });
 }
