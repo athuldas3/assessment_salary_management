@@ -9,6 +9,13 @@ from app.db.base import Base
 
 
 class Employee(Base):
+    """Employee salary record.
+
+    Indexes (e.g. on country) let the database use a B-Tree-style structure to find
+    matching rows without scanning the entire table — e.g. country=India -> row ids
+    3, 5, 100 instead of reading all 10,000 rows.
+    """
+
     __tablename__ = "employees"
     __table_args__ = (
         CheckConstraint("salary > 0", name="ck_employees_salary_positive"),
