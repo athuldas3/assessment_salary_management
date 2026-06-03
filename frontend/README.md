@@ -51,3 +51,4 @@ src/
 2. Seed data if needed: `python scripts/seed_employees.py --count 10000 --batch-size 500 --clear`
 3. Start frontend: `npm run dev`
 4. Open `/employees` to manage employee records
+5. Open `/insights` to review salary analytics
