@@ -430,6 +430,8 @@ http://localhost:8000/docs
 
 This supports manual verification during backend implementation and assessment review.
 
+For copy-paste curl commands covering every endpoint, see [api-curl-examples.md](./api-curl-examples.md).
+
 ## Deliberately Excluded Endpoints
 
 | Endpoint | Reason |

@@ -101,6 +101,7 @@ Current coverage: **46 backend tests**, **13 frontend tests**.
 | [Architecture](docs/architecture.md) | Layered design, trade-offs, diagrams |
 | [Database design](docs/database-design.md) | Schema, indexes, query patterns |
 | [API design](docs/api-design.md) | REST endpoints and response shapes |
+| [API cURL examples](docs/api-curl-examples.md) | Copy-paste curl commands for manual API testing |
 | [AI usage notes](docs/ai-usage-notes.md) | How AI assisted and how correctness was verified |
 | [Demo script](docs/demo-script.md) | Step-by-step walkthrough for reviewers |
 | [Deployment guidance](docs/deployment.md) | Production env vars, hosting options, and release checklist |

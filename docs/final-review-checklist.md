@@ -85,6 +85,7 @@ Then follow [demo-script.md](./demo-script.md).
 | Architecture | Design and trade-offs | [architecture.md](./architecture.md) |
 | Database design | Schema and indexes | [database-design.md](./database-design.md) |
 | API design | Endpoint contracts | [api-design.md](./api-design.md) |
+| API cURL examples | Manual endpoint testing | [api-curl-examples.md](./api-curl-examples.md) |
 | Root README | Setup and run commands | [../README.md](../README.md) |
 | AI usage notes | How AI helped and was verified | [ai-usage-notes.md](./ai-usage-notes.md) |
 | Demo script | Reviewer walkthrough | [demo-script.md](./demo-script.md) |
