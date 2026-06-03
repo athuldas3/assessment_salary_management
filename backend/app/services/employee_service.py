@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from app.core.exceptions import NotFoundError
+from app.core.transactions import transaction
 from app.repositories.employee_repository import (
     EmployeeRepository,
     EmployeeWriteData,
@@ -62,48 +63,30 @@ class EmployeeService:
         return self._to_response(employee)
 
     async def create_employee(self, data: EmployeeCreate) -> EmployeeResponse:
-        try:
+        async with transaction(self.repository.session):
             employee = await self.repository.create(self._to_write_data(data))
-            await self.repository.session.commit()
             return self._to_response(employee)
-        except Exception:
-            await self.repository.session.rollback()
-            raise
 
     async def update_employee(
         self,
         employee_id: UUID,
         data: EmployeeUpdate,
     ) -> EmployeeResponse:
-        try:
+        async with transaction(self.repository.session):
             employee = await self.repository.get_by_id(employee_id)
             if employee is None:
                 raise NotFoundError("Employee not found")
 
             updated = await self.repository.update(employee, self._to_write_data(data))
-            await self.repository.session.commit()
             return self._to_response(updated)
-        except NotFoundError:
-            await self.repository.session.rollback()
-            raise
-        except Exception:
-            await self.repository.session.rollback()
-            raise
 
     async def delete_employee(self, employee_id: UUID) -> None:
-        try:
+        async with transaction(self.repository.session):
             employee = await self.repository.get_by_id(employee_id)
             if employee is None:
                 raise NotFoundError("Employee not found")
 
             await self.repository.delete(employee)
-            await self.repository.session.commit()
-        except NotFoundError:
-            await self.repository.session.rollback()
-            raise
-        except Exception:
-            await self.repository.session.rollback()
-            raise
 
     async def get_filter_metadata(self) -> EmployeeFilterMetadataResponse:
         metadata = await self.repository.get_filter_metadata()

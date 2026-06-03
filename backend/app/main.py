@@ -3,11 +3,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.router import api_router
 from app.core.config import settings
 from app.core.exception_handlers import (
     app_error_handler,
+    integrity_error_handler,
+    sqlalchemy_error_handler,
     unhandled_error_handler,
     validation_error_handler,
 )
@@ -32,6 +35,8 @@ def create_app() -> FastAPI:
     )
     app.add_exception_handler(AppError, app_error_handler)
     app.add_exception_handler(RequestValidationError, validation_error_handler)
+    app.add_exception_handler(IntegrityError, integrity_error_handler)
+    app.add_exception_handler(SQLAlchemyError, sqlalchemy_error_handler)
     app.add_exception_handler(Exception, unhandled_error_handler)
     app.include_router(api_router, prefix=settings.api_v1_prefix)
     return app

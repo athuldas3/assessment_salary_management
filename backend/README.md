@@ -45,6 +45,21 @@ Rollback latest migration:
 alembic downgrade -1
 ```
 
+## Error Handling
+
+All API errors use a consistent JSON envelope:
+
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Employee not found"
+  }
+}
+```
+
+Write operations use transaction helpers that roll back automatically on failure.
+
 ## Run
 
 ```bash
