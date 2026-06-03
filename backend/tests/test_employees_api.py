@@ -113,3 +113,52 @@ async def test_create_employee_validation_error(client):
 
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+
+
+@pytest.mark.asyncio
+async def test_list_employees_with_multi_sort(client):
+    await client.post("/api/v1/employees", json=EMPLOYEE_PAYLOAD)
+    await client.post(
+        "/api/v1/employees",
+        json={
+            **EMPLOYEE_PAYLOAD,
+            "full_name": "John Smith",
+            "country": "Germany",
+            "salary": "80000.00",
+        },
+    )
+    await client.post(
+        "/api/v1/employees",
+        json={
+            **EMPLOYEE_PAYLOAD,
+            "full_name": "Zara Analyst",
+            "country": "Germany",
+            "job_title": "Data Analyst",
+            "department": "Operations",
+            "salary": "90000.00",
+        },
+    )
+
+    response = await client.get(
+        "/api/v1/employees",
+        params=[
+            ("sort", "country:asc"),
+            ("sort", "salary:desc"),
+            ("page_size", "10"),
+        ],
+    )
+
+    assert response.status_code == 200
+    names = [item["full_name"] for item in response.json()["items"]]
+    assert names == ["Zara Analyst", "John Smith", "Jane Doe"]
+
+
+@pytest.mark.asyncio
+async def test_list_employees_invalid_sort_field(client):
+    response = await client.get(
+        "/api/v1/employees",
+        params={"sort": "badfield:asc"},
+    )
+
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "VALIDATION_ERROR"

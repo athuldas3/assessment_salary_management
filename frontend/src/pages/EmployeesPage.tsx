@@ -2,6 +2,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { Alert, Box, Button, Chip, Stack } from "@mui/material";
 import { useMemo, useState } from "react";
 
+import type { EmployeeSort, EmployeeSortField } from "../api/employees";
 import {
   useCreateEmployee,
   useDeleteEmployee,
@@ -18,6 +19,11 @@ import { DeleteEmployeeDialog } from "../features/employees/DeleteEmployeeDialog
 import { EmployeeFiltersBar } from "../features/employees/EmployeeFiltersBar";
 import { EmployeeFormDialog } from "../features/employees/EmployeeFormDialog";
 import { EmployeeTable } from "../features/employees/EmployeeTable";
+import {
+  cycleSort,
+  DEFAULT_SORTS,
+  formatSortLabel,
+} from "../features/employees/sortUtils";
 import type { EmployeeFormValues } from "../schemas/employee";
 
 type DialogState =
@@ -32,6 +38,7 @@ export function EmployeesPage() {
   const [search, setSearch] = useState("");
   const [country, setCountry] = useState("");
   const [jobTitle, setJobTitle] = useState("");
+  const [sorts, setSorts] = useState<EmployeeSort[]>(DEFAULT_SORTS);
   const [dialogState, setDialogState] = useState<DialogState>({ type: "closed" });
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -42,10 +49,9 @@ export function EmployeesPage() {
       search: search || undefined,
       country: country || undefined,
       job_title: jobTitle || undefined,
-      sort_by: "full_name",
-      sort_order: "asc" as const,
+      sort: sorts,
     }),
-    [country, jobTitle, page, pageSize, search],
+    [country, jobTitle, page, pageSize, search, sorts],
   );
 
   const filtersQuery = useEmployeeFilters();
@@ -97,6 +103,27 @@ export function EmployeesPage() {
     setPage(0);
   };
 
+  const handleSortChange = (field: EmployeeSortField) => {
+    setSorts((current) => {
+      const next = cycleSort(current, field);
+      return next.length ? next : DEFAULT_SORTS;
+    });
+    setPage(0);
+  };
+
+  const clearSorting = () => {
+    setSorts(DEFAULT_SORTS);
+    setPage(0);
+  };
+
+  const hasCustomSorting =
+    sorts.length !== DEFAULT_SORTS.length ||
+    sorts.some(
+      (sort, index) =>
+        sort.field !== DEFAULT_SORTS[index]?.field ||
+        sort.order !== DEFAULT_SORTS[index]?.order,
+    );
+
   return (
     <>
       <PageHeader
@@ -141,6 +168,17 @@ export function EmployeesPage() {
         onClear={clearFilters}
       />
 
+      {hasCustomSorting ? (
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mb: 2 }}>
+          {sorts.map((sort) => (
+            <Chip key={`${sort.field}-${sort.order}`} label={formatSortLabel(sort)} size="small" />
+          ))}
+          <Button size="small" onClick={clearSorting}>
+            Clear sorting
+          </Button>
+        </Stack>
+      ) : null}
+
       {employeesQuery.isLoading && !employeesQuery.data ? (
         <TableSkeleton />
       ) : null}
@@ -162,11 +200,13 @@ export function EmployeesPage() {
             page={page}
             pageSize={pageSize}
             totalItems={employeesQuery.data.total_items}
+            sorts={sorts}
             onPageChange={setPage}
             onPageSizeChange={(nextPageSize) => {
               setPageSize(nextPageSize);
               setPage(0);
             }}
+            onSortChange={handleSortChange}
             onEdit={(employee) => setDialogState({ type: "edit", employee })}
             onDelete={(employee) => setDialogState({ type: "delete", employee })}
           />

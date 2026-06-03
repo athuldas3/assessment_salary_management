@@ -6,6 +6,18 @@ import type {
   PaginatedEmployees,
 } from "./types";
 
+export type EmployeeSortField =
+  | "full_name"
+  | "country"
+  | "job_title"
+  | "department"
+  | "salary";
+
+export type EmployeeSort = {
+  field: EmployeeSortField;
+  order: "asc" | "desc";
+};
+
 export type EmployeeListQuery = {
   page?: number;
   page_size?: number;
@@ -13,12 +25,28 @@ export type EmployeeListQuery = {
   job_title?: string;
   department?: string;
   search?: string;
+  sort?: EmployeeSort[];
   sort_by?: string;
   sort_order?: "asc" | "desc";
 };
 
+function serializeSortParams(sort?: EmployeeSort[]) {
+  if (!sort?.length) {
+    return undefined;
+  }
+
+  return sort.map((item) => `${item.field}:${item.order}`);
+}
+
 export function getEmployees(params: EmployeeListQuery) {
-  return apiRequest<PaginatedEmployees>("/employees", { params });
+  const { sort, ...rest } = params;
+
+  return apiRequest<PaginatedEmployees>("/employees", {
+    params: {
+      ...rest,
+      sort: serializeSortParams(sort),
+    },
+  });
 }
 
 export function getEmployee(id: string) {

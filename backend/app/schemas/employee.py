@@ -2,7 +2,7 @@ from decimal import Decimal
 from enum import Enum
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_serializer
+from pydantic import BaseModel, ConfigDict, Field, field_serializer, model_validator
 
 
 class SortOrder(str, Enum):
@@ -18,6 +18,39 @@ class EmployeeSortField(str, Enum):
     SALARY = "salary"
     CREATED_AT = "created_at"
     UPDATED_AT = "updated_at"
+
+
+MAX_SORT_FIELDS = len(EmployeeSortField)
+
+
+class EmployeeSortSpec(BaseModel):
+    field: EmployeeSortField
+    order: SortOrder = SortOrder.ASC
+
+
+def parse_sort_query_values(values: list[str]) -> list[EmployeeSortSpec]:
+    specs: list[EmployeeSortSpec] = []
+
+    for value in values:
+        raw = value.strip()
+        if not raw:
+            raise ValueError("Sort value cannot be empty")
+
+        if ":" in raw:
+            field_raw, order_raw = raw.split(":", 1)
+            order = SortOrder(order_raw.strip().lower())
+        else:
+            field_raw = raw
+            order = SortOrder.ASC
+
+        specs.append(
+            EmployeeSortSpec(
+                field=EmployeeSortField(field_raw.strip()),
+                order=order,
+            )
+        )
+
+    return specs
 
 
 class EmployeeBase(BaseModel):
@@ -69,5 +102,34 @@ class EmployeeListParams(BaseModel):
     job_title: str | None = None
     department: str | None = None
     search: str | None = None
+    sort: list[EmployeeSortSpec] | None = None
+    sort_queries: list[str] = Field(default_factory=list, exclude=True)
     sort_by: EmployeeSortField = EmployeeSortField.FULL_NAME
     sort_order: SortOrder = SortOrder.ASC
+
+    @model_validator(mode="after")
+    def validate_sorts(self) -> "EmployeeListParams":
+        if self.sort_queries:
+            self.sort = parse_sort_query_values(self.sort_queries)
+
+        resolved = self.resolved_sorts
+        if not resolved:
+            raise ValueError("At least one sort field is required")
+
+        if len(resolved) > MAX_SORT_FIELDS:
+            raise ValueError(f"A maximum of {MAX_SORT_FIELDS} sort fields is allowed")
+
+        fields = [spec.field for spec in resolved]
+        if len(fields) != len(set(fields)):
+            raise ValueError("Duplicate sort fields are not allowed")
+
+        return self
+
+    @property
+    def resolved_sorts(self) -> list[EmployeeSortSpec]:
+        if self.sort:
+            return self.sort
+
+        return [
+            EmployeeSortSpec(field=self.sort_by, order=self.sort_order),
+        ]

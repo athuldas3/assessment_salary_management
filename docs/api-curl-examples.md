@@ -102,14 +102,20 @@ curl -sS "$BASE_URL/employees?department=Engineering" | jq
 curl -sS "$BASE_URL/employees?country=Canada&job_title=Finance%20Analyst&department=Finance&search=Alice&page=1&page_size=20" | jq
 ```
 
-**Sort by salary descending:**
+**Sort by salary descending (legacy single-field params):**
 
 ```bash
 curl -sS "$BASE_URL/employees?sort_by=salary&sort_order=desc" | jq
 ```
 
+**Multi-field sort (country ascending, then salary descending):**
+
+```bash
+curl -sS "$BASE_URL/employees?sort=country:asc&sort=salary:desc&page_size=20" | jq
+```
+
 **Sort fields:** `full_name`, `country`, `job_title`, `department`, `salary`, `created_at`, `updated_at`  
-**Sort order:** `asc` or `desc`  
+**Sort format:** `field:order` where order is `asc` or `desc` (order defaults to `asc` when omitted)  
 **Page size:** 1–100 (default 20)
 
 ---

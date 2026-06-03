@@ -1,7 +1,13 @@
 import pytest
+from pydantic import ValidationError
 
 from app.repositories.employee_repository import calculate_total_pages
-from app.schemas.employee import EmployeeListParams, EmployeeSortField, SortOrder
+from app.schemas.employee import (
+    EmployeeListParams,
+    EmployeeSortField,
+    EmployeeSortSpec,
+    SortOrder,
+)
 
 
 def test_calculate_total_pages():
@@ -51,6 +57,51 @@ async def test_list_employees_sorts_by_salary_desc(seeded_repository):
 
     salaries = [employee.salary for employee in employees]
     assert salaries == sorted(salaries, reverse=True)
+
+
+@pytest.mark.asyncio
+async def test_list_employees_supports_multi_sort(seeded_repository):
+    params = EmployeeListParams(
+        page=1,
+        page_size=10,
+        sort=[
+            EmployeeSortSpec(field=EmployeeSortField.COUNTRY, order=SortOrder.ASC),
+            EmployeeSortSpec(field=EmployeeSortField.SALARY, order=SortOrder.DESC),
+        ],
+    )
+    employees, _ = await seeded_repository.list_employees(params)
+
+    assert [employee.full_name for employee in employees] == [
+        "Carol Germany HR",
+        "David UK Analyst",
+        "Bob US Engineer",
+        "Alice US Engineer",
+    ]
+
+
+def test_employee_list_params_rejects_duplicate_sort_fields():
+    with pytest.raises(ValidationError):
+        EmployeeListParams(
+            page=1,
+            page_size=10,
+            sort=[
+                EmployeeSortSpec(field=EmployeeSortField.COUNTRY, order=SortOrder.ASC),
+                EmployeeSortSpec(field=EmployeeSortField.COUNTRY, order=SortOrder.DESC),
+            ],
+        )
+
+
+def test_employee_list_params_parses_sort_queries():
+    params = EmployeeListParams(
+        page=1,
+        page_size=10,
+        sort_queries=["country:asc", "salary:desc"],
+    )
+
+    assert params.resolved_sorts == [
+        EmployeeSortSpec(field=EmployeeSortField.COUNTRY, order=SortOrder.ASC),
+        EmployeeSortSpec(field=EmployeeSortField.SALARY, order=SortOrder.DESC),
+    ]
 
 
 @pytest.mark.asyncio

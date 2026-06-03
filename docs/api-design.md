@@ -19,7 +19,7 @@ http://localhost:8000/api/v1
 | Money | Salary returned as decimal strings or numbers with two decimal places |
 | Timestamps | ISO 8601 UTC strings |
 | Pagination | `page` (1-based) and `page_size` query params |
-| Sorting | Whitelisted `sort_by` and `sort_order` query params |
+| Sorting | Repeatable `sort=field:order` query params with legacy `sort_by` / `sort_order` fallback |
 | Errors | Consistent JSON error envelope |
 | Auth | None in v1 scope |
 
@@ -126,8 +126,12 @@ List employees with pagination, filtering, and sorting.
 | `job_title` | string | No | — | Exact job title filter |
 | `department` | string | No | — | Exact department filter |
 | `search` | string | No | — | Case-insensitive match on `full_name` |
-| `sort_by` | string | No | `full_name` | One of: `full_name`, `country`, `job_title`, `department`, `salary`, `created_at`, `updated_at` |
-| `sort_order` | string | No | `asc` | `asc` or `desc` |
+| `sort` | string (repeatable) | No | — | Multi-field sort in `field:order` format, e.g. `country:asc`, `salary:desc` |
+| `sort_by` | string | No | `full_name` | Legacy single-field sort when `sort` is omitted |
+| `sort_order` | string | No | `asc` | Legacy sort direction when `sort` is omitted |
+
+**Sort fields:** `full_name`, `country`, `job_title`, `department`, `salary`, `created_at`, `updated_at`  
+**Sort order:** `asc` or `desc` (defaults to `asc` when omitted, e.g. `sort=country`)
 
 **Response 200**
 
@@ -136,12 +140,21 @@ Returns `PaginatedEmployeeResponse`.
 **Example**
 
 ```http
-GET /api/v1/employees?page=1&page_size=20&country=United%20States&job_title=Software%20Engineer&sort_by=salary&sort_order=desc
+GET /api/v1/employees?page=1&page_size=20&country=United%20States&job_title=Software%20Engineer&sort=salary:desc
+```
+
+**Multi-field sort example**
+
+```http
+GET /api/v1/employees?sort=country:asc&sort=salary:desc&page_size=20
 ```
 
 **Notes**
 
 - Filtering and sorting happen in SQL.
+- When `sort` is provided, fields are applied in request order (`ORDER BY country ASC, salary DESC`).
+- Duplicate sort fields are rejected with 422.
+- Legacy `sort_by` / `sort_order` remain supported when `sort` is omitted.
 - `total_items` and `total_pages` come from a separate count query.
 - This endpoint powers the employee table UI.
 
@@ -406,7 +419,7 @@ Missing or invalid query params.
 
 - Salary must be a positive decimal.
 - String fields must respect max lengths from the database schema.
-- Unknown `sort_by` values are rejected with 422.
+- Unknown sort fields and duplicate `sort` values are rejected with 422.
 - `page_size` above 100 is rejected with 422.
 - Repository/service layer owns query construction; routes only validate and delegate.
 

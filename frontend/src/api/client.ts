@@ -16,10 +16,12 @@ export class ApiError extends Error {
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api/v1";
 
+type QueryParamValue = string | number | undefined | null | string[];
+
 type RequestOptions = {
   method?: string;
   body?: unknown;
-  params?: Record<string, string | number | undefined | null>;
+  params?: Record<string, QueryParamValue>;
 };
 
 function buildUrl(path: string, params?: RequestOptions["params"]) {
@@ -27,9 +29,20 @@ function buildUrl(path: string, params?: RequestOptions["params"]) {
 
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        url.searchParams.set(key, String(value));
+      if (value === undefined || value === null || value === "") {
+        return;
       }
+
+      if (Array.isArray(value)) {
+        value.forEach((item) => {
+          if (item !== "") {
+            url.searchParams.append(key, String(item));
+          }
+        });
+        return;
+      }
+
+      url.searchParams.set(key, String(value));
     });
   }
 

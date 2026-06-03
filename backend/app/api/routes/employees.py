@@ -1,6 +1,8 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
 
 from app.api.deps import get_employee_service
 from app.schemas.employee import (
@@ -25,19 +27,24 @@ def get_employee_list_params(
     job_title: str | None = None,
     department: str | None = None,
     search: str | None = None,
+    sort: list[str] = Query(default=[]),
     sort_by: EmployeeSortField = EmployeeSortField.FULL_NAME,
     sort_order: SortOrder = SortOrder.ASC,
 ) -> EmployeeListParams:
-    return EmployeeListParams(
-        page=page,
-        page_size=page_size,
-        country=country,
-        job_title=job_title,
-        department=department,
-        search=search,
-        sort_by=sort_by,
-        sort_order=sort_order,
-    )
+    try:
+        return EmployeeListParams(
+            page=page,
+            page_size=page_size,
+            country=country,
+            job_title=job_title,
+            department=department,
+            search=search,
+            sort_queries=sort,
+            sort_by=sort_by,
+            sort_order=sort_order,
+        )
+    except ValidationError as exc:
+        raise RequestValidationError(exc.errors()) from exc
 
 
 @router.get("/metadata/filters", response_model=EmployeeFilterMetadataResponse)

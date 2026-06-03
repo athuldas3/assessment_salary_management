@@ -1,6 +1,7 @@
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import {
+  Box,
   IconButton,
   Paper,
   Stack,
@@ -11,29 +12,84 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TableSortLabel,
   Typography,
 } from "@mui/material";
 
+import type { EmployeeSort, EmployeeSortField } from "../../api/employees";
 import type { Employee } from "../../api/types";
+import { getSortForField } from "./sortUtils";
 
 type EmployeeTableProps = {
   employees: Employee[];
   page: number;
   pageSize: number;
   totalItems: number;
+  sorts: EmployeeSort[];
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
+  onSortChange: (field: EmployeeSortField) => void;
   onEdit: (employee: Employee) => void;
   onDelete: (employee: Employee) => void;
 };
+
+type SortableHeaderProps = {
+  label: string;
+  field: EmployeeSortField;
+  sorts: EmployeeSort[];
+  onSortChange: (field: EmployeeSortField) => void;
+  align?: "left" | "right";
+};
+
+function SortableHeader({
+  label,
+  field,
+  sorts,
+  onSortChange,
+  align = "left",
+}: SortableHeaderProps) {
+  const sortState = getSortForField(sorts, field);
+
+  return (
+    <TableCell align={align} sortDirection={sortState.active ? sortState.order : false}>
+      <TableSortLabel
+        active={sortState.active}
+        direction={sortState.active ? sortState.order : "asc"}
+        onClick={() => onSortChange(field)}
+      >
+        <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: 0.75 }}>
+          {label}
+          {sortState.priority ? (
+            <Box
+              component="span"
+              sx={{
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                lineHeight: 1,
+                px: 0.75,
+                py: 0.25,
+                borderRadius: 999,
+                bgcolor: "action.selected",
+              }}
+            >
+              {sortState.priority}
+            </Box>
+          ) : null}
+        </Box>
+      </TableSortLabel>
+    </TableCell>
+  );
+}
 
 export function EmployeeTable({
   employees,
   page,
   pageSize,
   totalItems,
+  sorts,
   onPageChange,
   onPageSizeChange,
+  onSortChange,
   onEdit,
   onDelete,
 }: EmployeeTableProps) {
@@ -43,11 +99,37 @@ export function EmployeeTable({
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Country</TableCell>
-              <TableCell>Job Title</TableCell>
-              <TableCell>Department</TableCell>
-              <TableCell align="right">Salary</TableCell>
+              <SortableHeader
+                label="Name"
+                field="full_name"
+                sorts={sorts}
+                onSortChange={onSortChange}
+              />
+              <SortableHeader
+                label="Country"
+                field="country"
+                sorts={sorts}
+                onSortChange={onSortChange}
+              />
+              <SortableHeader
+                label="Job Title"
+                field="job_title"
+                sorts={sorts}
+                onSortChange={onSortChange}
+              />
+              <SortableHeader
+                label="Department"
+                field="department"
+                sorts={sorts}
+                onSortChange={onSortChange}
+              />
+              <SortableHeader
+                label="Salary"
+                field="salary"
+                sorts={sorts}
+                onSortChange={onSortChange}
+                align="right"
+              />
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>

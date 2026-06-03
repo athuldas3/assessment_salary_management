@@ -55,11 +55,15 @@ class EmployeeRepository:
         query = self._apply_filters(query, params)
         count_query = self._apply_filters(count_query, params)
 
-        sort_column = SORT_COLUMN_MAP[params.sort_by]
-        if params.sort_order == SortOrder.DESC:
-            query = query.order_by(sort_column.desc())
-        else:
-            query = query.order_by(sort_column.asc())
+        order_clauses = []
+        for spec in params.resolved_sorts:
+            sort_column = SORT_COLUMN_MAP[spec.field]
+            if spec.order == SortOrder.DESC:
+                order_clauses.append(sort_column.desc())
+            else:
+                order_clauses.append(sort_column.asc())
+
+        query = query.order_by(*order_clauses)
 
         offset = (params.page - 1) * params.page_size
         query = query.offset(offset).limit(params.page_size)
