@@ -100,12 +100,33 @@ Docker uses **one** application database, like production. The separate `test_db
 
 | Problem | Likely cause | Fix |
 |---|---|---|
+| `permission denied` on `/var/run/docker.sock` | Shell session started before you joined the `docker` group | Log out and back in, or run `newgrp docker`, then retry. If not in the group: `sudo usermod -aG docker $USER` then log out/in |
+| Build hangs on `apt-get update` / `Ign: deb.debian.org` | DNS failure inside Docker build containers | See **Fix Docker DNS** below |
+| `pip` / `npm` fails with `Temporary failure in name resolution` | Same DNS issue during image build | Compose uses `network: host` for builds; also apply **Fix Docker DNS** for a permanent fix |
 | Port 8080 or 8000 in use | Another local service | Stop conflicting service or change compose ports |
 | Empty employee table | Seed disabled or failed startup | Check `docker compose logs backend`; set `SEED_ON_START=true` |
 | CORS errors | Wrong origin | Ensure `CORS_ORIGINS=http://localhost:8080` |
 | Frontend 404 on refresh | nginx misconfig | Rebuild frontend image; SPA fallback is in `frontend/nginx.conf` |
 | Backend crash on start | DB not ready / migration error | `docker compose logs db backend` |
 | Stale data | Old volume | `docker compose down -v && docker compose up --build` |
+
+### Fix Docker DNS (recommended on Linux)
+
+If builds fail with `Ign: deb.debian.org` or `Temporary failure in name resolution`, Docker’s internal DNS is broken even though your host network works. Apply this once:
+
+```bash
+sudo mkdir -p /etc/docker
+echo '{"dns":["8.8.8.8","1.1.1.1"]}' | sudo tee /etc/docker/daemon.json
+sudo systemctl restart docker
+```
+
+Verify:
+
+```bash
+docker run --rm alpine ping -c 2 deb.debian.org
+```
+
+This project also sets `network: host` on backend/frontend **builds** in `docker-compose.yml` so `pip` and `npm` use your host DNS during image build.
 
 ## Useful Commands
 
