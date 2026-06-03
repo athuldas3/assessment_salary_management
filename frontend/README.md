@@ -48,5 +48,6 @@ src/
 ## Verify
 
 1. Start backend: `uvicorn app.main:app --reload`
-2. Start frontend: `npm run dev`
-3. Confirm the sidebar loads and the API status chip shows `API connected`
+2. Seed data if needed: `python scripts/seed_employees.py --count 10000 --batch-size 500 --clear`
+3. Start frontend: `npm run dev`
+4. Open `/employees` to manage employee records
