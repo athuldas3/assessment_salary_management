@@ -103,6 +103,7 @@ Current coverage: **46 backend tests**, **13 frontend tests**.
 | [API design](docs/api-design.md) | REST endpoints and response shapes |
 | [AI usage notes](docs/ai-usage-notes.md) | How AI assisted and how correctness was verified |
 | [Demo script](docs/demo-script.md) | Step-by-step walkthrough for reviewers |
+| [Deployment guidance](docs/deployment.md) | Production env vars, hosting options, and release checklist |
 
 Component READMEs:
 

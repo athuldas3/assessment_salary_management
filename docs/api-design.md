@@ -418,7 +418,7 @@ The backend will allow the local Vite frontend origin during development, for ex
 http://localhost:5173
 ```
 
-Production deployment docs will define the final allowed origins.
+Production allowed origins are configured with the `CORS_ORIGINS` environment variable. See [deployment.md](./deployment.md).
 
 ## OpenAPI
 
