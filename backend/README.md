@@ -94,3 +94,5 @@ Test coverage includes:
 ```bash
 python scripts/seed_employees.py --count 10000 --batch-size 500 --clear
 ```
+
+Full script options, migrations, and troubleshooting: [docs/scripts.md](../docs/scripts.md).

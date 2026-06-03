@@ -20,7 +20,9 @@ To regenerate the sample file:
 
 ```bash
 cd backend
-source .venv/bin/activate
+source env/bin/activate
 pip install openpyxl
 python scripts/generate_sample_excel.py
 ```
+
+See [docs/scripts.md](../docs/scripts.md) for all script and command documentation.

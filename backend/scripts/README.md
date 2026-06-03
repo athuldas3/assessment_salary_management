@@ -1,17 +1,41 @@
 # Scripts
 
-## Seed employees
+Backend utility scripts and common commands. For the full guide, see [docs/scripts.md](../../docs/scripts.md).
 
-From the `backend` directory:
+## Prerequisites
 
 ```bash
-source .venv/bin/activate
+cd backend
+source env/bin/activate
+alembic upgrade head
+```
+
+## Seed employees
+
+```bash
 python scripts/seed_employees.py --count 10000 --batch-size 500 --clear
 ```
 
-Options:
+| Option | Default | Description |
+|---|---|---|
+| `--count` | `10000` | Number of employees to insert |
+| `--batch-size` | `500` | Bulk insert batch size |
+| `--clear` / `--no-clear` | clear | Truncate employees before seeding |
+| `--database-url` | from env | Override target database |
 
-- `--count` — number of employees to insert (default: 10000)
-- `--batch-size` — bulk insert batch size (default: 500)
-- `--clear` / `--no-clear` — truncate employees before seeding (default: clear)
-- `--database-url` — override database URL
+## Generate sample Excel
+
+```bash
+pip install openpyxl
+python scripts/generate_sample_excel.py
+```
+
+Writes `data/sample_employees.xlsx` (50 rows, reference only).
+
+## Run API
+
+```bash
+python run.py
+```
+
+See [docs/scripts.md](../../docs/scripts.md) for migrations, tests, and troubleshooting.
