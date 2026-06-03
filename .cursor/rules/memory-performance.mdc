@@ -1,0 +1,18 @@
+---
+description: Performance and memory management rules
+globs: backend/**/*.py,frontend/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Memory And Performance
+
+- Do not load unnecessary full employee datasets into memory.
+- Use pagination for list screens and APIs.
+- Use SQL aggregate functions for insights instead of calculating over large result sets in application code.
+- Seed 10,000 employees with deterministic batch or bulk insert patterns.
+- Keep API payloads focused on fields needed by the UI.
+- Use async I/O for database and HTTP work when the stack is async; do not use async for CPU-bound work by default.
+- Avoid multiprocessing or multithreading unless there is a measured need and a clear trade-off.
+- On the frontend, use React Query caching, loading states, and invalidation after mutations.
+- Avoid expensive client-side filtering over large datasets; ask the backend for filtered pages.
+- Measure before optimizing beyond the expected 10,000 employee scale.

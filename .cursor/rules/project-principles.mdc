@@ -1,0 +1,15 @@
+---
+description: Core project principles for the salary management assessment
+alwaysApply: true
+---
+
+# Project Principles
+
+- Build the smallest complete system that satisfies the assessment well.
+- Prefer clarity, correctness, maintainability, and testability over cleverness.
+- Keep implementation aligned with `docs/requirements.md`.
+- Do not add technologies unless they directly improve the assessment outcome.
+- Keep business logic out of UI components, route handlers, and migration files.
+- Document important trade-offs where reviewers will benefit from the reasoning.
+- Use incremental commit messages after major steps, but only commit when asked.
+- Treat salary data as sensitive: validate inputs, avoid leaking internals, and keep logs useful but non-sensitive.

@@ -1,0 +1,18 @@
+---
+description: Backend architecture rules for FastAPI and SQLAlchemy
+globs: backend/**/*.py
+alwaysApply: false
+---
+
+# Backend Architecture
+
+- Use layered boundaries: API routes, services, repositories, models, schemas, database/session, core config, and tests.
+- Keep route handlers thin: parse request, call a service, return schema output.
+- Put business rules and transaction orchestration in services.
+- Put SQLAlchemy query construction and persistence details in repositories.
+- Use dependency injection for database sessions and services.
+- Use Pydantic schemas for request and response DTOs; do not return ORM objects directly.
+- Use explicit domain exceptions for not-found, validation, and conflict cases.
+- Add global FastAPI exception handlers that return consistent API error shapes.
+- Use Alembic migrations for schema changes; never create production tables manually in app startup.
+- Prefer simple abstractions until duplication or complexity proves a real need.

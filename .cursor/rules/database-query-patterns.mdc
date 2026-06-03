@@ -1,0 +1,18 @@
+---
+description: Database schema, indexing, and query rules
+globs: backend/**/*.py,**/*.sql,backend/alembic/**/*.py
+alwaysApply: false
+---
+
+# Database And Query Patterns
+
+- Use PostgreSQL-friendly SQLAlchemy 2.x models and migrations.
+- Use UUID primary keys, `Numeric` or `Decimal` for salary, and timestamps for audit fields.
+- Keep list APIs paginated; never return all employees by default.
+- Apply filtering, sorting, and aggregation in SQL rather than Python loops.
+- Add indexes for common filters: country, job title, country plus job title, and salary where analytics benefit.
+- Explain each important index in database notes or migration comments when helpful.
+- Avoid N+1 patterns; use joins, select loading, or aggregate queries intentionally.
+- Use stable, whitelisted sort fields to prevent unsafe dynamic SQL.
+- Use transactions for writes and seed operations; rollback on exceptions.
+- Test salary insights against known fixture data with exact expected aggregate results.

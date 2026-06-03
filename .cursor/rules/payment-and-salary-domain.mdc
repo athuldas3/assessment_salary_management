@@ -1,0 +1,18 @@
+---
+description: Salary and payment-domain safety rules
+globs: backend/**/*.py,frontend/**/*.{ts,tsx},docs/**/*.md
+alwaysApply: false
+---
+
+# Salary And Payment Domain Rules
+
+- This assessment manages salary records and insights; do not add real payroll execution unless explicitly requested.
+- Represent money with decimal-safe types, never floating point.
+- Validate salary ranges and required employee fields at API boundaries.
+- Avoid logging full salary payloads, raw request bodies, or sensitive employee details.
+- If future payment execution is added, require idempotency keys, immutable ledger entries, reconciliation, authorization, and audit trails.
+- Do not overwrite salary values without explicit update intent from the user.
+- Keep compensation calculations deterministic and test them with fixed fixtures.
+- Return user-friendly validation errors while keeping internal error details out of API responses.
+- Treat currency conversion, tax, bonuses, and payroll rules as out of scope unless requirements are formally updated.
+- Document any compensation-domain assumption in requirements, architecture notes, or API docs.

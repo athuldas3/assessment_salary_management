@@ -1,0 +1,17 @@
+---
+description: Frontend architecture and UX rules for React
+globs: frontend/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Frontend Patterns
+
+- Build a simple HR Manager workflow: employee table, filters, forms, delete confirmation, and insights dashboard.
+- Use React Query for data fetching, caching, loading states, errors, and mutation invalidation.
+- Keep forms validated with React Hook Form and Zod.
+- Show friendly user-facing error messages; do not expose backend internals.
+- Keep components small and focused; move API calls and reusable state into hooks or service modules.
+- Preserve server-side pagination, filtering, and sorting instead of duplicating large-data logic in the browser.
+- Use accessible labels, clear empty states, and confirmation for destructive actions.
+- Prefer boring, readable UI over complex custom interactions.
+- Test key flows where practical: render table data, validate forms, handle loading/error states, and submit mutations.

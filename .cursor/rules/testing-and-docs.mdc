@@ -1,0 +1,17 @@
+---
+description: Testing, documentation, and review-readiness rules
+globs: **/*.{py,ts,tsx,md}
+alwaysApply: false
+---
+
+# Testing And Documentation
+
+- Write meaningful tests that assert behavior, not implementation trivia.
+- Cover employee CRUD, validation failures, not-found cases, salary insights, and transaction rollback where useful.
+- Use deterministic fixtures and seed data so tests are fast and repeatable.
+- Keep test database setup separate from local development data.
+- Add frontend tests only where they improve confidence in key user flows.
+- Update documentation when setup commands, migrations, seed behavior, APIs, or architecture decisions change.
+- Include commands for backend setup, frontend setup, migrations, seeding, tests, and running the app.
+- Keep architecture and trade-off notes concise enough for assessment reviewers to scan.
+- Include AI usage notes that explain how AI helped and how correctness was verified.
